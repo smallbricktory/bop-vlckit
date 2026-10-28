@@ -4,7 +4,8 @@ Source changes that Small Bricktory applies to VideoLAN's MobileVLCKit 3.7.4 for
 
 ## Contents
 
-- `vlckit-3.7.4-bop1.patch`: one commit on VLCKit tag `3.7.4`.
+- `vlckit-3.7.4-bop2.patch`: one commit on VLCKit tag `3.7.4`. bop2 = bop1 with iOS minimum 26.0.
+- `vlckit-3.7.4-bop1.patch`: the earlier build, minimum iOS 27.0.
 - `tools/gpl_scan.py`: license-header scanner used to check the build.
 - `LICENSE`: GNU Lesser General Public License 2.1.
 
@@ -15,7 +16,7 @@ Source changes that Small Bricktory applies to VideoLAN's MobileVLCKit 3.7.4 for
 3. yadif and yadif2x deinterlace modes (`yadif.h`, `yadif_template.h`, `algo_yadif.c/.h`), removed by VLC patch 0047. The modes auto (x), blend, mean, bob, linear, discard, phosphor and ivtc remain.
 4. FFmpeg 8.1.2 `libavcodec/aarch64/ac3dsp_init_aarch64.c` and `ac3dsp_neon.S` (GPL-2+ headers), removed by VLC patch 0048. The C versions of the AC-3 DSP functions take over.
 
-Other changes in `buildMobileVLCKit.sh`: `SDK_MIN=27.0`, and the iOS simulator slice is arm64 only.
+Other changes in `buildMobileVLCKit.sh`: `SDK_MIN=26.0` (bop1: 27.0), `export ASMFLAGS="${EXTRA_CFLAGS}"` (CMake-built assembly objects such as libmpg123 carry the same minimum), and the iOS simulator slice is arm64 only.
 
 ## Upstream sources
 
@@ -34,7 +35,7 @@ Requirements: Apple-silicon Mac, macOS, Xcode with the iOS SDK, network access t
 git clone https://github.com/videolan/vlckit.git vlckit
 cd vlckit
 git checkout 3.7.4
-git am /path/to/vlckit-3.7.4-bop1.patch
+git am /path/to/vlckit-3.7.4-bop2.patch
 
 # VLC source with VLCKit's patches plus 0047 and 0048
 git clone --branch 3.0.x https://github.com/videolan/vlc.git libvlc/vlc
@@ -50,10 +51,10 @@ tar xzf make-4.4.1.tar.gz
 ./buildMobileVLCKit.sh -n -f
 ```
 
-`-n` skips the script's own clone-and-patch step. The result is `build/MobileVLCKit.xcframework` with slices `ios-arm64` and `ios-arm64-simulator` (dynamic frameworks, minimum iOS 27.0, dSYMs included). Package it with:
+`-n` skips the script's own clone-and-patch step. The result is `build/MobileVLCKit.xcframework` with slices `ios-arm64` and `ios-arm64-simulator` (dynamic frameworks, minimum iOS 26.0, dSYMs included). Package it with:
 
 ```sh
-ditto -c -k --keepParent build/MobileVLCKit.xcframework MobileVLCKit-3.7.4-bop1.xcframework.zip
+ditto -c -k --keepParent build/MobileVLCKit.xcframework MobileVLCKit-3.7.4-bop2.xcframework.zip
 ```
 
 A rebuild is not bit-identical (timestamps, build paths).
@@ -79,9 +80,11 @@ The scan lists files whose header names the GPL without the Lesser/Library varia
 
 ## Prebuilt framework
 
-The framework built from these sources is attached to the GitHub release `3.7.4-bop1` as `MobileVLCKit-3.7.4-bop1.xcframework.zip`.
+The framework built from these sources is attached to the GitHub release `3.7.4-bop2` as `MobileVLCKit-3.7.4-bop2.xcframework.zip`.
 
-sha256: `a4e8a14ba5bdb3bd2364302058199567a378d0e28f384a37d0ac30d82166dcb9`
+sha256: `92cff7b1d7b6837e5983ca6ebb51869bb677e9f2adca9bb0e6171005746c36be`
+
+Release `3.7.4-bop1` (minimum iOS 27.0, sha256 `a4e8a14ba5bdb3bd2364302058199567a378d0e28f384a37d0ac30d82166dcb9`) was built from `vlckit-3.7.4-bop1.patch`.
 
 ## License
 
