@@ -4,6 +4,7 @@ Small Bricktory's changes to VideoLAN's MobileVLCKit 3.7.4 for the iOS app bop: 
 
 ## Contents
 
+- `vlckit-3.7.4-bop2.patch`: one commit on VLCKit tag `3.7.4`; iOS minimum 26.0.
 - `vlckit-3.7.4-bop1.patch`: one commit on VLCKit tag `3.7.4`; iOS minimum 27.0.
 - `tools/gpl_scan.py`: license-header scanner.
 - `LICENSE`: GNU Lesser General Public License 2.1.
@@ -14,8 +15,9 @@ Small Bricktory's changes to VideoLAN's MobileVLCKit 3.7.4 for the iOS app bop: 
 2. Module blacklist: `librotate_plugin`, `libvod_rtsp_plugin`, `libstream_out_rtp_plugin`, `libsyslog_plugin`, `libmono_plugin`, `libdolby_surround_decoder_plugin`, `libdummy_plugin`.
 3. VLC patch 0047: removes `yadif.h`, `yadif_template.h` and `algo_yadif.c/.h` from the deinterlace plugin, and the yadif and yadif2x modes from every mode list.
 4. VLC patch 0048: removes FFmpeg 8.1.2 `libavcodec/aarch64/ac3dsp_init_aarch64.c` and `ac3dsp_neon.S` from the aarch64 build.
-5. `SDK_MIN=27.0`.
-6. iOS simulator slice: arm64.
+5. `SDK_MIN=26.0` (bop1: 27.0).
+6. `export ASMFLAGS="${EXTRA_CFLAGS}"` (bop2 only).
+7. iOS simulator slice: arm64.
 
 ## Upstream sources
 
@@ -34,7 +36,7 @@ Requirements: Apple-silicon Mac, Xcode with the iOS SDK, network access to githu
 git clone https://github.com/videolan/vlckit.git vlckit
 cd vlckit
 git checkout 3.7.4
-git am /path/to/vlckit-3.7.4-bop1.patch
+git am /path/to/vlckit-3.7.4-bop2.patch
 
 git clone --branch 3.0.x https://github.com/videolan/vlc.git libvlc/vlc
 git -C libvlc/vlc checkout -B localBranch 6de05adcbaf2e8b85fe86aad4169393098628119
@@ -51,7 +53,7 @@ tar xzf make-4.4.1.tar.gz
 Output: `build/MobileVLCKit.xcframework`, slices `ios-arm64` and `ios-arm64-simulator`, dynamic frameworks with dSYMs. Package:
 
 ```sh
-ditto -c -k --keepParent build/MobileVLCKit.xcframework MobileVLCKit-3.7.4-bop1.xcframework.zip
+ditto -c -k --keepParent build/MobileVLCKit.xcframework MobileVLCKit-3.7.4-bop2.xcframework.zip
 ```
 
 ## Verify
@@ -77,6 +79,7 @@ Expected hits, all dual- or exception-licensed: 70 mbedTLS headers in librist (`
 
 | Release | Asset | sha256 |
 |---|---|---|
+| `3.7.4-bop2` | `MobileVLCKit-3.7.4-bop2.xcframework.zip` | `92cff7b1d7b6837e5983ca6ebb51869bb677e9f2adca9bb0e6171005746c36be` |
 | `3.7.4-bop1` | `MobileVLCKit-3.7.4-bop1.xcframework.zip` | `a4e8a14ba5bdb3bd2364302058199567a378d0e28f384a37d0ac30d82166dcb9` |
 
 ## License
