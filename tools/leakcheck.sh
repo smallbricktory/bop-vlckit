@@ -6,7 +6,7 @@
 set -euo pipefail
 
 user=$(whoami)
-pattern="$HOME|/Users/$user|$(hostname -s)|$(hostname -f 2>/dev/null || hostname)"
+pattern="$HOME|/Users/$user|$user|$(hostname -s)|$(hostname -f 2>/dev/null || hostname)"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 

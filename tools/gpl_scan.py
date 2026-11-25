@@ -6,11 +6,28 @@ src_list, root = sys.argv[1], os.path.realpath(sys.argv[2])
 gpl = re.compile(r'GNU General Public License|GPL-[23]|GPLv[23]|General Public License', re.I)
 lgpl = re.compile(r'Lesser General|Library General|LGPL', re.I)
 hits, scanned, missing = [], 0, 0
-for line in open(src_list):
-    p = line.strip()
+phys = '/private' + root if root.startswith('/tmp/') else root
+
+def resolve(p):
+    # dSYM paths are absolute, ./-relative (-ffile-prefix-map), or an unmapped
+    # comp_dir joined to a mapped name ("<dir>/./libvlc/..."); try each candidate.
+    cands = []
     if p.startswith('./'):
-        p = os.path.join(root, p.rsplit('/./', 1)[-1] if '/./' in p else p[2:])
-    if not p.startswith(root):
+        cands.append(os.path.join(root, p[2:]))
+    for base in (root, phys):
+        if p.startswith(base + '/'):
+            cands.append(root + p[len(base):])
+    i = p.find('/./')
+    while i != -1:
+        cands.append(os.path.join(root, p[i + 3:]))
+        i = p.find('/./', i + 1)
+    for c in cands:
+        if os.path.isfile(c):
+            return c
+    return cands[0] if cands else None
+for line in open(src_list):
+    p = resolve(line.strip())
+    if p is None:
         continue
     if not os.path.isfile(p):
         missing += 1
