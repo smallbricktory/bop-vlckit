@@ -976,11 +976,11 @@ index 0000000..b409b0f
 + };
 diff --git a/libvlc/patches/0048-contrib-ffmpeg-do-not-build-the-GPL-2-aarch64-AC-3-D.patch b/libvlc/patches/0048-contrib-ffmpeg-do-not-build-the-GPL-2-aarch64-AC-3-D.patch
 new file mode 100644
-index 0000000..98974aa
+index 0000000..2abf66b
 --- /dev/null
 +++ b/libvlc/patches/0048-contrib-ffmpeg-do-not-build-the-GPL-2-aarch64-AC-3-D.patch
 @@ -0,0 +1,66 @@
-+From d5fd432e4e639b6fa1eb94dafd80b889e063bc0d Mon Sep 17 00:00:00 2001
++From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 +From: Small Bricktory <studio@smallbricktory.com>
 +Date: Wed, 28 Oct 2026 11:35:02 -0700
 +Subject: [PATCH] contrib: ffmpeg: do not build the GPL-2+ aarch64 AC-3 DSP
@@ -989,17 +989,17 @@ index 0000000..98974aa
 +Remove FFmpeg's libavcodec/aarch64/ac3dsp_init_aarch64.c and
 +ac3dsp_neon.S from the aarch64 build.
 +---
-+ .../avcodec-aarch64-no-gpl-ac3dsp.patch       | 35 +++++++++++++++++++
++ .../avcodec-aarch64-no-gpl-ac3dsp.patch       | 34 +++++++++++++++++++
 + contrib/src/ffmpeg/rules.mak                  |  1 +
-+ 2 files changed, 36 insertions(+)
++ 2 files changed, 35 insertions(+)
 + create mode 100644 contrib/src/ffmpeg/avcodec-aarch64-no-gpl-ac3dsp.patch
 +
 +diff --git a/contrib/src/ffmpeg/avcodec-aarch64-no-gpl-ac3dsp.patch b/contrib/src/ffmpeg/avcodec-aarch64-no-gpl-ac3dsp.patch
 +new file mode 100644
-+index 000000000..800f6a81f
++index 000000000..b964a41c5
 +--- /dev/null
 ++++ b/contrib/src/ffmpeg/avcodec-aarch64-no-gpl-ac3dsp.patch
-+@@ -0,0 +1,35 @@
++@@ -0,0 +1,34 @@
 ++avcodec/aarch64: do not build the GPL-2+ AC-3 DSP NEON code
 ++
 ++Remove libavcodec/aarch64/ac3dsp_init_aarch64.c and ac3dsp_neon.S from
