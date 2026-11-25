@@ -34,7 +34,7 @@ Source of earlier builds (bop1, bop2): commit `c07d7cf`.
 
 ## Build
 
-Requirements: Apple-silicon Mac, Xcode with the iOS SDK, network access to github.com, ftp.gnu.org, download.videolan.org and code.videolan.org, about 12 GB of disk. Release built with macOS 27.2 and Xcode 27.2 in `/tmp/bop-vlckit`.
+Requirements: Apple-silicon Mac, Xcode with the iOS SDK, network access to github.com, ftp.gnu.org, download.videolan.org and code.videolan.org, about 12 GB of disk. Release built with macOS 27.2.1 and Xcode 27.2 in `/tmp/bop-vlckit`.
 
 ```sh
 mkdir -p /tmp/bop-vlckit && cd /tmp/bop-vlckit
