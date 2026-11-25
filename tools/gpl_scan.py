@@ -1,4 +1,6 @@
-"""Usage: python3 -I gpl_scan.py <sources.txt> <build-root>; lists files from `dwarfdump --show-sources` whose header names the GPL without the Lesser/Library variant."""
+"""Classify the license header of every source file that dwarfdump --show-sources lists for a binary.
+Usage: python3 -I gpl_scan.py <sources.txt> <build-root>
+Prints files whose header names the GNU GPL without the Lesser/Library variant (candidates for review)."""
 import re, sys, os
 src_list, root = sys.argv[1], os.path.realpath(sys.argv[2])
 gpl = re.compile(r'GNU General Public License|GPL-[23]|GPLv[23]|General Public License', re.I)
@@ -6,6 +8,8 @@ lgpl = re.compile(r'Lesser General|Library General|LGPL', re.I)
 hits, scanned, missing = [], 0, 0
 for line in open(src_list):
     p = line.strip()
+    if p.startswith('./'):
+        p = os.path.join(root, p.rsplit('/./', 1)[-1] if '/./' in p else p[2:])
     if not p.startswith(root):
         continue
     if not os.path.isfile(p):

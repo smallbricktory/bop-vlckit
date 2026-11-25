@@ -1,25 +1,30 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Small Bricktory <studio@smallbricktory.com>
-Date: Wed, 28 Oct 2026 12:53:51 -0700
-Subject: [PATCH] MobileVLCKit 3.7.4-bop1: remove GPL-licensed code
+Date: Wed, 25 Nov 2026 14:15:00 -0700
+Subject: [PATCH] MobileVLCKit 3.7.4-bop3: remove GPL-licensed code, iOS
+ minimum 26.0, no build paths
 
 - contrib bootstrap and VLC configure: --disable-zvbi
 - module blacklist: rotate, vod_rtsp, stream_out_rtp, syslog, mono,
   dolby_surround_decoder, dummy
 - VLC patch 0047: remove the yadif and yadif2x deinterlace modes
 - VLC patch 0048: FFmpeg contrib without the aarch64 AC-3 DSP NEON code
-- SDK_MIN=27.0
+- SDK_MIN=26.0
+- export ASMFLAGS="${EXTRA_CFLAGS}"
 - iOS simulator slice: arm64
+- -ffile-prefix-map=${ROOT_DIR}=. for libVLC, contribs and the Xcode project
+- xcodebuild archive: -derivedDataPath ${ROOT_DIR}/build/DerivedData
+- VLC_COMPILE_BY and VLC_COMPILE_HOST: bop-vlckit
 ---
- buildMobileVLCKit.sh                          |  18 +-
+ buildMobileVLCKit.sh                          |  25 +-
  ...ve-the-GPL-2-yadif-and-yadif2x-modes.patch | 879 ++++++++++++++++++
  ...o-not-build-the-GPL-2-aarch64-AC-3-D.patch |  66 ++
- 3 files changed, 956 insertions(+), 7 deletions(-)
+ 3 files changed, 961 insertions(+), 9 deletions(-)
  create mode 100644 libvlc/patches/0047-deinterlace-remove-the-GPL-2-yadif-and-yadif2x-modes.patch
  create mode 100644 libvlc/patches/0048-contrib-ffmpeg-do-not-build-the-GPL-2-aarch64-AC-3-D.patch
 
 diff --git a/buildMobileVLCKit.sh b/buildMobileVLCKit.sh
-index 3e274a0..372023d 100755
+index 3e274a0..594a722 100755
 --- a/buildMobileVLCKit.sh
 +++ b/buildMobileVLCKit.sh
 @@ -9,7 +9,7 @@ BUILD_SIMULATOR=yes
@@ -27,7 +32,7 @@ index 3e274a0..372023d 100755
  BUILD_ARCH=`uname -m | cut -d. -f1`
  SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 -SDK_MIN=9.0
-+SDK_MIN=27.0
++SDK_MIN=26.0
  VERBOSE=no
  DEBUG=no
  CONFIGURATION="Release"
@@ -40,7 +45,35 @@ index 3e274a0..372023d 100755
              else
                  if [ "$INCLUDE_32BIT" = "yes" ]; then
                      architectures="armv7 armv7s arm64"
-@@ -554,7 +554,7 @@ buildLibVLC() {
+@@ -279,8 +279,10 @@ buildxcodeproj()
+                -configuration ${CONFIGURATION} \
+                -scheme "$target" \
+                -archivePath build/"$target"-$PLATFORM$SDK.xcarchive \
++               -derivedDataPath "${ROOT_DIR}/build/DerivedData" \
+                ARCHS="${architectures}" \
+                IPHONEOS_DEPLOYMENT_TARGET=${SDK_MIN} \
++               OTHER_CFLAGS="\$(inherited) -ffile-prefix-map=${ROOT_DIR}=." \
+                ${bitcodeflag} \
+                SKIP_INSTALL=no \
+                > ${out}
+@@ -400,7 +402,7 @@ buildLibVLC() {
+     export SDK_VERSION=$SDK_VERSION
+     export VLCSDKROOT=$SDKROOT
+ 
+-    EXTRA_CFLAGS="-isysroot ${SDKROOT}"
++    EXTRA_CFLAGS="-isysroot ${SDKROOT} -ffile-prefix-map=${ROOT_DIR}=."
+     EXTRA_LDFLAGS="-arch ${ACTUAL_ARCH}"
+ 
+     if [ "$PLATFORM" = "OS" ]; then
+@@ -437,6 +439,7 @@ buildLibVLC() {
+     export CPPFLAGS="${EXTRA_CFLAGS}"
+     export CXXFLAGS="${EXTRA_CFLAGS}"
+     export OBJCFLAGS="${EXTRA_CFLAGS}"
++    export ASMFLAGS="${EXTRA_CFLAGS}"
+     export LDFLAGS="${EXTRA_LDFLAGS}"
+ 
+     spushd ${VLCROOT}/contrib
+@@ -554,7 +557,7 @@ buildLibVLC() {
          --disable-sdl \
          --disable-SDL_image \
          --disable-iconv \
@@ -49,7 +82,7 @@ index 3e274a0..372023d 100755
          --disable-kate \
          --disable-caca \
          --disable-gettext \
-@@ -642,7 +642,7 @@ buildLibVLC() {
+@@ -642,7 +645,7 @@ buildLibVLC() {
      fi
  
      if [ "$SCARY" = "yes" ]; then
@@ -58,7 +91,16 @@ index 3e274a0..372023d 100755
      else
          SCARYFLAG="--disable-dca --disable-dvbpsi --disable-avcodec --disable-avformat --disable-zvbi --enable-vpx"
      fi
-@@ -793,6 +793,13 @@ buildLibVLC() {
+@@ -661,7 +664,7 @@ buildLibVLC() {
+          "${THIS_SCRIPT_PATH}" -nt config.log ]; then
+          info "Configuring vlc"
+ 
+-    ${VLCROOT}/configure \
++    VLC_COMPILE_BY=bop-vlckit VLC_COMPILE_HOST=bop-vlckit ${VLCROOT}/configure \
+         --prefix="${PREFIX}" \
+         --host="${HOST_TRIPLET}" \
+         --with-contrib="${VLCROOT}/contrib/${OSSTYLE}${PLATFORM_IDENTIFIER}-${HOST_TRIPLET}-${ARCH}" \
+@@ -793,6 +796,13 @@ buildLibVLC() {
      fingerprinter
      output_udp
      output_livehttp
@@ -72,7 +114,7 @@ index 3e274a0..372023d 100755
      "
  
      if [ "$SCARY" = "no" ]; then
-@@ -880,7 +887,6 @@ buildMobileKit() {
+@@ -880,7 +890,6 @@ buildMobileKit() {
              fi
              if [ "$IOS" = "yes" ]; then
                  if [ "$PLATFORM" = "iphonesimulator" ]; then
@@ -80,7 +122,7 @@ index 3e274a0..372023d 100755
                      buildLibVLC "aarch64" "Simulator"
                  else
                      if [ "$INCLUDE_32BIT" = "yes" ]; then
-@@ -951,8 +957,6 @@ collect_symbols_and_libraries() {
+@@ -951,8 +960,6 @@ collect_symbols_and_libraries() {
      arch="aarch64"
      if [ "$FARCH" != "all" ];then
          arch="$FARCH"
